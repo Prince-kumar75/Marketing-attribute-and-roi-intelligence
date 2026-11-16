@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketing Attribution & ROI Intelligence Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js CDN for interactive visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="logo-icon">📊</div>
+                <div class="brand-text">
+                    <h2>ROI Intelligence</h2>
+                    <span>Marketing Attribution</span>
+                </div>
+            </div>
+            <nav class="nav-menu">
+                <button class="nav-item active" data-page="page-overview">
+                    <span class="icon">📈</span> Executive Overview
+                </button>
+                <button class="nav-item" data-page="page-channels">
+                    <span class="icon">🎯</span> Channel Performance
+                </button>
+                <button class="nav-item" data-page="page-campaigns">
+                    <span class="icon">🚀</span> Campaign Analysis
+                </button>
+                <button class="nav-item" data-page="page-attribution">
+                    <span class="icon">🔀</span> Attribution Models
+                </button>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="status-badge">Enterprise Edition</div>
+                <p>FY 2025 Comprehensive Audit</p>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Top Filter Bar / Slicers -->
+            <header class="top-header">
+                <div class="header-titles">
+                    <h1 id="page-title">Executive Overview</h1>
+                    <p id="page-desc">High-level digital marketing spend, revenue generation, and portfolio ROI metrics</p>
+                </div>
+                <div class="slicers-container">
+                    <div class="slicer-group">
+                        <label for="channel-slicer">Channel</label>
+                        <select id="channel-slicer">
+                            <option value="ALL">All Channels (6)</option>
+                            <option value="Google Ads">Google Ads</option>
+                            <option value="Facebook Ads">Facebook Ads</option>
+                            <option value="Instagram Ads">Instagram Ads</option>
+                            <option value="Email Marketing">Email Marketing</option>
+                            <option value="Organic Search">Organic Search</option>
+                            <option value="Referral Marketing">Referral Marketing</option>
+                        </select>
+                    </div>
+                    <div class="slicer-group">
+                        <label for="status-slicer">Status</label>
+                        <select id="status-slicer">
+                            <option value="ALL">All Statuses</option>
+                            <option value="Active">Active</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Paused">Paused</option>
+                        </select>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                <!-- ================= PAGE 1: EXECUTIVE OVERVIEW ================= -->
+                <section id="page-overview" class="dashboard-page active">
+                    <!-- KPI Cards Grid -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Total Spend</div>
+                            <div class="kpi-val" id="kpi-spend">$4,678,276</div>
+                            <div class="kpi-sub">Marketing capital deployed</div>
+                        </div>
+                        <div class="kpi-card highlight-green">
+                            <div class="kpi-label">Total Revenue</div>
+                            <div class="kpi-val" id="kpi-revenue">$52,091,563</div>
+                            <div class="kpi-sub">Gross revenue generated</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Overall ROI</div>
+                            <div class="kpi-val" id="kpi-roi">1,013.5%</div>
+                            <div class="kpi-sub">Portfolio return on investment</div>
+                        </div>
+                        <div class="kpi-card highlight-blue">
+                            <div class="kpi-label">Portfolio ROAS</div>
+                            <div class="kpi-val" id="kpi-roas">11.13x</div>
+                            <div class="kpi-sub">Revenue / Spend multiple</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Total Conversions</div>
+                            <div class="kpi-val" id="kpi-conv">311,114</div>
+                            <div class="kpi-sub">Blended CAC: $15.04</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Total Leads</div>
+                            <div class="kpi-val" id="kpi-leads">869,457</div>
+                            <div class="kpi-sub">Blended Conv Rate: 5.76%</div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Grid 1 -->
+                    <div class="charts-row">
+                        <div class="chart-panel flex-2">
+                            <div class="panel-header">
+                                <h3>Monthly Spend vs. Revenue Trends (FY 2025)</h3>
+                                <span class="badge">MoM Momentum</span>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-monthly-trends"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-panel flex-1">
+                            <div class="panel-header">
+                                <h3>Revenue Share by Channel</h3>
+                                <span class="badge">Portfolio Share</span>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-revenue-donut"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Channel Summary Table -->
+                    <div class="table-panel">
+                        <div class="panel-header">
+                            <h3>Executive Channel Performance Matrix</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table" id="table-overview">
+                                <thead>
+                                    <tr>
+                                        <th>Marketing Channel</th>
+                                        <th>Total Spend</th>
+                                        <th>Revenue</th>
+                                        <th>Net Profit</th>
+                                        <th>ROAS</th>
+                                        <th>ROI (%)</th>
+                                        <th>Conversions</th>
+                                        <th>CAC</th>
+                                        <th>Conv. Rate</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= PAGE 2: CHANNEL PERFORMANCE ================= -->
+                <section id="page-channels" class="dashboard-page">
+                    <div class="charts-row">
+                        <div class="chart-panel flex-1">
+                            <div class="panel-header">
+                                <h3>Channel Return on Investment (ROI %)</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-channel-roi"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-panel flex-1">
+                            <div class="panel-header">
+                                <h3>Channel ROAS Multiples (x)</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-channel-roas"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="charts-row">
+                        <div class="chart-panel flex-1">
+                            <div class="panel-header">
+                                <h3>Customer Acquisition Cost (CAC) vs. CPC</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-cac-cpc"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-panel flex-1">
+                            <div class="panel-header">
+                                <h3>Funnel Conversion Rates (%)</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-funnel-rates"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= PAGE 3: CAMPAIGN ANALYSIS ================= -->
+                <section id="page-campaigns" class="dashboard-page">
+                    <div class="charts-row">
+                        <div class="table-panel flex-1">
+                            <div class="panel-header">
+                                <h3 class="text-green">🏆 Top 10 Profitable Campaigns (Star Performers)</h3>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="table-top-campaigns">
+                                    <thead>
+                                        <tr>
+                                            <th>Campaign Name</th>
+                                            <th>Channel</th>
+                                            <th>Spend</th>
+                                            <th>Revenue</th>
+                                            <th>Profit</th>
+                                            <th>ROAS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="table-panel flex-1">
+                            <div class="panel-header">
+                                <h3 class="text-red">⚠️ Lowest Performing Campaigns (Budget Optimization)</h3>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="data-table" id="table-bottom-campaigns">
+                                    <thead>
+                                        <tr>
+                                            <th>Campaign Name</th>
+                                            <th>Channel</th>
+                                            <th>Spend</th>
+                                            <th>Revenue</th>
+                                            <th>Profit</th>
+                                            <th>ROAS</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ================= PAGE 4: ATTRIBUTION ANALYSIS ================= -->
+                <section id="page-attribution" class="dashboard-page">
+                    <div class="info-alert">
+                        <strong>💡 Multi-Touch Attribution Insight:</strong>
+                        Single-touch Last-Touch models over-attribute bottom-of-funnel closers like Google Ads (+24.1% shift) and Email (+12.6% shift), while severely undervaluing top-of-funnel discovery channels like Facebook Ads (-15.6% shift) and Organic Search (-17.2% shift). Position-Based (40-40-20) provides an equitable balance.
+                    </div>
+
+                    <div class="charts-row">
+                        <div class="chart-panel flex-2">
+                            <div class="panel-header">
+                                <h3>Attribution Model Revenue Comparison by Channel ($)</h3>
+                                <span class="badge">Multi-Touch Analysis</span>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-attribution-comparison"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-panel flex-1">
+                            <div class="panel-header">
+                                <h3>Attribution Shift: Last-Touch minus First-Touch ($)</h3>
+                                <span class="badge">Channel Bias</span>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-attribution-shift"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-panel">
+                        <div class="panel-header">
+                            <h3>Attribution Models Revenue & Conversion Share Matrix</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table" id="table-attribution">
+                                <thead>
+                                    <tr>
+                                        <th>Marketing Channel</th>
+                                        <th>First-Touch Rev</th>
+                                        <th>First-Touch %</th>
+                                        <th>Last-Touch Rev</th>
+                                        <th>Last-Touch %</th>
+                                        <th>Linear Rev</th>
+                                        <th>Linear %</th>
+                                        <th>Position-Based Rev</th>
+                                        <th>Position-Based %</th>
+                                        <th>Shift Type</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Load Embedded Data Script -->
+    <script src="dashboard_data.js"></script>
+    <!-- Main Dashboard Controller -->
+    <script src="app.js"></script>
+</body>
+</html>

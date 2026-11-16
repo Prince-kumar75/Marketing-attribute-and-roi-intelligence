@@ -1,0 +1,86 @@
+{
+  "model_name": "Marketing_Attribution_and_ROI_Intelligence",
+  "version": "1.0",
+  "description": "Star schema data model for Power BI digital marketing attribution and ROI analytics",
+  "tables": [
+    {
+      "name": "Fact_Marketing_Campaigns",
+      "type": "Fact",
+      "source": "data/processed/marketing_campaign_data_cleaned.csv",
+      "primary_key": ["Campaign ID", "Campaign Date"],
+      "foreign_keys": [
+        {"column": "Campaign Date", "references_table": "Dim_Date", "references_column": "Date"},
+        {"column": "Marketing Channel", "references_table": "Dim_Channel", "references_column": "Channel_Name"},
+        {"column": "Campaign ID", "references_table": "Dim_Campaign", "references_column": "Campaign_ID"}
+      ]
+    },
+    {
+      "name": "Fact_Attribution_Touchpoints",
+      "type": "Fact",
+      "source": "data/processed/customer_attribution_touchpoints.csv",
+      "primary_key": ["Customer ID", "Touchpoint Sequence"],
+      "foreign_keys": [
+        {"column": "Touchpoint Date", "references_table": "Dim_Date", "references_column": "Date"},
+        {"column": "Marketing Channel", "references_table": "Dim_Channel", "references_column": "Channel_Name"}
+      ]
+    },
+    {
+      "name": "Fact_Attribution_Summary",
+      "type": "Summary Fact",
+      "source": "data/processed/marketing_attribution_summary.csv",
+      "primary_key": ["Marketing Channel"],
+      "foreign_keys": [
+        {"column": "Marketing Channel", "references_table": "Dim_Channel", "references_column": "Channel_Name"}
+      ]
+    },
+    {
+      "name": "Dim_Date",
+      "type": "Dimension",
+      "columns": ["Date", "Year", "Quarter", "Month", "Month_Name", "Month_Year", "Day_of_Week", "Is_Weekend"]
+    },
+    {
+      "name": "Dim_Channel",
+      "type": "Dimension",
+      "columns": ["Channel_Name", "Channel_Category", "Funnel_Orientation", "Default_Attribution_Weight"]
+    },
+    {
+      "name": "Dim_Campaign",
+      "type": "Dimension",
+      "columns": ["Campaign_ID", "Campaign_Name", "Marketing_Channel", "Campaign_Status"]
+    }
+  ],
+  "relationships": [
+    {
+      "from_table": "Fact_Marketing_Campaigns",
+      "from_column": "Campaign Date",
+      "to_table": "Dim_Date",
+      "to_column": "Date",
+      "cardinality": "ManyToOne",
+      "cross_filtering": "Single"
+    },
+    {
+      "from_table": "Fact_Marketing_Campaigns",
+      "from_column": "Marketing Channel",
+      "to_table": "Dim_Channel",
+      "to_column": "Channel_Name",
+      "cardinality": "ManyToOne",
+      "cross_filtering": "Single"
+    },
+    {
+      "from_table": "Fact_Marketing_Campaigns",
+      "from_column": "Campaign ID",
+      "to_table": "Dim_Campaign",
+      "to_column": "Campaign_ID",
+      "cardinality": "ManyToOne",
+      "cross_filtering": "Single"
+    },
+    {
+      "from_table": "Fact_Attribution_Summary",
+      "from_column": "Marketing Channel",
+      "to_table": "Dim_Channel",
+      "to_column": "Channel_Name",
+      "cardinality": "OneToOne",
+      "cross_filtering": "Both"
+    }
+  ]
+}

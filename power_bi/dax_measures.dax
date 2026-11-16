@@ -1,0 +1,203 @@
+// ==============================================================================
+// MARKETING ATTRIBUTION & ROI INTELLIGENCE - POWER BI DAX MEASURES LIBRARY
+// Enterprise Star Schema Compatible
+// Folder Structure:
+//   _Financial Core
+//   _Performance Ratios
+//   _Attribution Engine
+//   _Time Intelligence
+//   _Dynamic Rankings & KPIs
+// ==============================================================================
+
+// ------------------------------------------------------------------------------
+// FOLDER: _Financial Core
+// ------------------------------------------------------------------------------
+
+[Total Spend] = 
+SUM(marketing_campaigns[marketing_spend])
+
+[Total Revenue] = 
+SUM(marketing_campaigns[revenue])
+
+[Net Profit] = 
+[Total Revenue] - [Total Spend]
+
+[Net Profit Margin %] = 
+DIVIDE([Net Profit], [Total Revenue], 0)
+
+[Total Impressions] = 
+SUM(marketing_campaigns[impressions])
+
+[Total Clicks] = 
+SUM(marketing_campaigns[clicks])
+
+[Total Leads] = 
+SUM(marketing_campaigns[leads])
+
+[Total Conversions] = 
+SUM(marketing_campaigns[conversions])
+
+
+// ------------------------------------------------------------------------------
+// FOLDER: _Performance Ratios
+// ------------------------------------------------------------------------------
+
+[ROAS] = 
+DIVIDE([Total Revenue], [Total Spend], 0)
+
+[ROI %] = 
+DIVIDE([Net Profit], [Total Spend], 0)
+
+[CAC (Customer Acquisition Cost)] = 
+DIVIDE([Total Spend], [Total Conversions], 0)
+
+[CPC (Cost Per Click)] = 
+DIVIDE([Total Spend], [Total Clicks], 0)
+
+[CPL (Cost Per Lead)] = 
+DIVIDE([Total Spend], [Total Leads], 0)
+
+[CTR % (Click-Through Rate)] = 
+DIVIDE([Total Clicks], [Total Impressions], 0)
+
+[Conversion Rate %] = 
+DIVIDE([Total Conversions], [Total Clicks], 0)
+
+[Lead Rate %] = 
+DIVIDE([Total Leads], [Total Clicks], 0)
+
+[Lead To Conversion Rate %] = 
+DIVIDE([Total Conversions], [Total Leads], 0)
+
+[Average Order Value (AOV)] = 
+DIVIDE([Total Revenue], [Total Conversions], 0)
+
+
+// ------------------------------------------------------------------------------
+// FOLDER: _Attribution Engine
+// ------------------------------------------------------------------------------
+
+[First Touch Attributed Revenue] = 
+SUM(marketing_attribution_summary[First_Touch_Revenue])
+
+[Last Touch Attributed Revenue] = 
+SUM(marketing_attribution_summary[Last_Touch_Revenue])
+
+[Linear Attributed Revenue] = 
+SUM(marketing_attribution_summary[Linear_Revenue])
+
+[Position Based Attributed Revenue] = 
+SUM(marketing_attribution_summary[Position_Based_Revenue])
+
+[Attribution Shift (Last - First)] = 
+[Last Touch Attributed Revenue] - [First Touch Attributed Revenue]
+
+[First Touch Revenue Share %] = 
+DIVIDE(
+    [First Touch Attributed Revenue], 
+    CALCULATE([First Touch Attributed Revenue], ALLSELECTED(marketing_attribution_summary[marketing_channel])), 
+    0
+)
+
+[Last Touch Revenue Share %] = 
+DIVIDE(
+    [Last Touch Attributed Revenue], 
+    CALCULATE([Last Touch Attributed Revenue], ALLSELECTED(marketing_attribution_summary[marketing_channel])), 
+    0
+)
+
+[Position Based Revenue Share %] = 
+DIVIDE(
+    [Position Based Attributed Revenue], 
+    CALCULATE([Position Based Attributed Revenue], ALLSELECTED(marketing_attribution_summary[marketing_channel])), 
+    0
+)
+
+[Selected Attribution Model Revenue] = 
+VAR SelectedModel = SELECTEDVALUE('Attribution Model Parameter'[Model Name], "Position-Based")
+RETURN
+    SWITCH(
+        SelectedModel,
+        "First-Touch", [First Touch Attributed Revenue],
+        "Last-Touch", [Last Touch Attributed Revenue],
+        "Linear", [Linear Attributed Revenue],
+        "Position-Based", [Position Based Attributed Revenue],
+        [Position Based Attributed Revenue]
+    )
+
+
+// ------------------------------------------------------------------------------
+// FOLDER: _Time Intelligence
+// ------------------------------------------------------------------------------
+
+[Prior Month Revenue] = 
+CALCULATE(
+    [Total Revenue],
+    DATEADD('Dim_Date'[Date], -1, MONTH)
+)
+
+[Prior Month Spend] = 
+CALCULATE(
+    [Total Spend],
+    DATEADD('Dim_Date'[Date], -1, MONTH)
+)
+
+[MoM Revenue Growth $] = 
+[Total Revenue] - [Prior Month Revenue]
+
+[MoM Revenue Growth %] = 
+DIVIDE([MoM Revenue Growth $], [Prior Month Revenue], 0)
+
+[YTD Revenue] = 
+TOTALYTD([Total Revenue], 'Dim_Date'[Date])
+
+[YTD Spend] = 
+TOTALYTD([Total Spend], 'Dim_Date'[Date])
+
+
+// ------------------------------------------------------------------------------
+// FOLDER: _Dynamic Rankings & KPIs
+// ------------------------------------------------------------------------------
+
+[Campaign ROAS Rank] = 
+IF(
+    ISBLANK([ROAS]),
+    BLANK(),
+    RANKX(
+        ALLSELECTED(marketing_campaigns[campaign_name]),
+        [ROAS],
+        ,
+        DESC,
+        Dense
+    )
+)
+
+[Campaign Profit Rank] = 
+IF(
+    ISBLANK([Net Profit]),
+    BLANK(),
+    RANKX(
+        ALLSELECTED(marketing_campaigns[campaign_name]),
+        [Net Profit],
+        ,
+        DESC,
+        Dense
+    )
+)
+
+[Channel Efficiency Status] = 
+VAR CurrentROAS = [ROAS]
+RETURN
+    SWITCH(
+        TRUE(),
+        CurrentROAS >= 15.0, "Superstar (ROAS >= 15x)",
+        CurrentROAS >= 5.0,  "Highly Profitable (5x - 15x)",
+        CurrentROAS >= 2.5,  "Sustainable (2.5x - 5x)",
+        CurrentROAS >= 1.0,  "Marginal (1x - 2.5x)",
+        "Underperforming (< 1x)"
+    )
+
+[Target ROAS Benchmark] = 4.0
+
+[ROAS vs Target %] = 
+DIVIDE([ROAS] - [Target ROAS Benchmark], [Target ROAS Benchmark], 0)
